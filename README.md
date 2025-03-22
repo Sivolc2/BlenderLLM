@@ -247,3 +247,89 @@ We are from the School of Data Science (SDS), the Chinese University of Hong Kon
     <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=FreedomIntelligence/HuatuoGPT&type=Date" />
   </picture>
 </a> -->
+
+## Setup
+
+1. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+2. Make sure Blender is installed on your system.
+
+3. Set your API keys for remote models (if using OpenAI or Anthropic Claude):
+   ```
+   # For OpenAI models
+   export OPENAI_API_KEY="your_openai_key"
+   
+   # For Anthropic Claude models
+   export ANTHROPIC_API_KEY="your_anthropic_key"
+   ```
+
+## Usage
+
+### Seamless Builder
+
+The easiest way to use BlenderLLM is with the seamless builder script. This will:
+1. Generate a Blender script based on your text prompt
+2. Create a 3D model as an OBJ file
+3. Render images of the model from multiple angles
+
+```bash
+# Using OpenAI's GPT-4
+python seamless_builder.py --prompt "A simple potted plant with small leaves" 
+
+# Using Anthropic's Claude 3.7 Sonnet
+python seamless_builder.py --model_name anthropic:claude-3-7-sonnet-20240708 --prompt "A simple potted plant with small leaves"
+
+# Show generated script and enable debug logging
+python seamless_builder.py --model_name anthropic:claude-3-7-sonnet-20240708 --prompt "A steering wheel" --show_script --debug
+```
+
+### Options
+
+```
+--model_name: Model to use (default: openai:gpt-4)
+  - Local model: path/to/model
+  - OpenAI: openai:gpt-4
+  - Anthropic: anthropic:claude-3-7-sonnet-20240708
+  - Custom API: api:your-endpoint
+
+--prompt: Text description of what to create
+--obj_name: Name for output files (default: generated from prompt)
+--output_folder: Where to save files (default: output/)
+--blender_executable: Path to Blender (auto-detected on macOS)
+--brightness: Lighting brightness (Very Bright, Bright, Medium Bright, Dark, Very Dark)
+--show_script: Display the generated script before execution
+--skip_render: Only generate OBJ file without rendering images
+--debug: Enable debug logging
+--keep_temp_scripts: Keep temporary scripts for debugging purposes
+```
+
+## Supported Models
+
+### Local Models
+- Any local model supported by Hugging Face Transformers
+
+### Remote API Models
+- OpenAI: gpt-3.5-turbo, gpt-4, gpt-4-turbo, etc.
+- Anthropic Claude: 
+  - claude-3-opus-20240229
+  - claude-3-sonnet-20240229
+  - claude-3-haiku-20240307
+  - claude-3-5-sonnet-20240620
+  - claude-3-7-sonnet-20240708 (recommended for best results)
+
+## Example
+
+```bash
+python seamless_builder.py --model_name anthropic:claude-3-7-sonnet-20240708 --prompt "A simple potted plant with small leaves"
+```
+
+This will:
+1. Generate a Blender Python script
+2. Create a 3D model of a potted plant
+3. Save the model as an OBJ file
+4. Render images from multiple angles
+
+Output files will be in `output/a_simple_potted/`
