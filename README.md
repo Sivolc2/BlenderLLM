@@ -301,7 +301,7 @@ python seamless_builder.py --model_name anthropic:claude-3-7-sonnet-20240708 --p
 --blender_executable: Path to Blender (auto-detected on macOS)
 --brightness: Lighting brightness (Very Bright, Bright, Medium Bright, Dark, Very Dark)
 --show_script: Display the generated script before execution
---skip_render: Only generate OBJ file without rendering images
+--skip_render: Only generate OBJ file without rendering
 --debug: Enable debug logging
 --keep_temp_scripts: Keep temporary scripts for debugging purposes
 ```
@@ -333,3 +333,72 @@ This will:
 4. Render images from multiple angles
 
 Output files will be in `output/a_simple_potted/`
+
+## MasterpieceX Integration
+
+We've also added support for using the MasterpieceX API to generate 3D models directly:
+
+### Prerequisites
+
+1. Sign up for a MasterpieceX account and get your API key from [their website](https://www.masterpiecex.com/)
+
+2. Install the SDK:
+   ```bash
+   pip install mpx-genai-sdk
+   ```
+
+3. Set your API key:
+   ```bash
+   export MPX_API_KEY="your_masterpiece_api_key"
+   ```
+
+### Simple Generation
+
+To generate and download a 3D model without using Blender scripts:
+
+```bash
+python masterpiecex.py --prompt "A steampunk robot with gears and pipes"
+```
+
+This will generate a 3D model using the MasterpieceX API and save it to the output folder.
+
+### Full Integration
+
+To generate a model and automatically render it with Blender:
+
+```bash
+python masterpiecex_integration.py --prompt "A steampunk robot with gears and pipes"
+```
+
+This script combines:
+1. MasterpieceX's 3D generation capabilities
+2. BlenderLLM's rendering features
+
+### Testing Without API Keys
+
+You can use simulation mode to test the workflow without making actual API calls:
+
+```bash
+# Test just the generation part
+python masterpiecex.py --prompt "A simple cube" --simulate
+
+# Test the full generation and rendering pipeline
+python masterpiecex_integration.py --prompt "A simple cube" --simulate
+```
+
+This creates a basic cube OBJ file to simulate the API response, allowing you to test the entire workflow without using API credits.
+
+### Options
+
+```
+--prompt: Text description of what to create (required)
+--obj_name: Name for output files (default: generated from prompt)
+--output_folder: Where to save files (default: output/)
+--poll_interval: Seconds between generation status checks (default: 10)
+--max_wait: Maximum time to wait for generation in seconds (default: 600)
+--blender_executable: Path to Blender (auto-detected on macOS)
+--brightness: Lighting brightness (Very Bright, Bright, Medium Bright, Dark, Very Dark)
+--skip_render: Only generate and download the model without rendering
+--debug: Enable debug logging
+--simulate: Simulate API calls for testing (no actual API calls)
+```
