@@ -139,12 +139,26 @@ def main():
     else:
         # Check if API key is set
         api_key = os.environ.get("MPX_API_KEY")
+        
+        if args.debug:
+            # Print environment variable info for debugging
+            logger.debug(f"MPX_API_KEY environment variable: {'SET' if api_key else 'NOT SET'}")
+            if api_key:
+                logger.debug(f"MPX_API_KEY length: {len(api_key)} characters")
+                logger.debug(f"MPX_API_KEY first/last chars: {api_key[:5]}...{api_key[-5:]}")
+            
+            # Check for SDK bearer token variable
+            sdk_token = os.environ.get("MPX_SDK_BEARER_TOKEN")
+            logger.debug(f"MPX_SDK_BEARER_TOKEN environment variable: {'SET' if sdk_token else 'NOT SET'}")
+        
         if not api_key:
             logger.error("MPX_API_KEY environment variable is not set. Please set it with your MasterpieceX API key.")
+            logger.error("Run: export MPX_API_KEY='your_api_key_here'")
             sys.exit(1)
         
-        # Set bearer token environment variable expected by the SDK
+        # Set bearer token environment variable expected by the SDK (force-set it even if already set)
         os.environ["MPX_SDK_BEARER_TOKEN"] = api_key
+        logger.debug("Set MPX_SDK_BEARER_TOKEN from MPX_API_KEY")
     
     # Generate model name from prompt
     model_name = get_obj_name_from_prompt(args.prompt)

@@ -241,6 +241,31 @@ f 8//6 4//6 2//6 6//6
     logger.info(f"Created simulation cube OBJ at: {output_path}")
     return output_path
 
+def check_api_key():
+    """Check if the MasterpieceX API key is set"""
+    api_key = os.environ.get("MPX_API_KEY")
+    
+    if logger.level <= logging.DEBUG:
+        # Print environment variable info for debugging
+        logger.debug(f"MPX_API_KEY environment variable: {'SET' if api_key else 'NOT SET'}")
+        if api_key:
+            logger.debug(f"MPX_API_KEY length: {len(api_key)} characters")
+            logger.debug(f"MPX_API_KEY first/last chars: {api_key[:5]}...{api_key[-5:]}")
+        
+        # Check for SDK bearer token variable
+        sdk_token = os.environ.get("MPX_SDK_BEARER_TOKEN")
+        logger.debug(f"MPX_SDK_BEARER_TOKEN environment variable: {'SET' if sdk_token else 'NOT SET'}")
+    
+    if not api_key:
+        logger.error("MPX_API_KEY environment variable is not set. Please set it with your MasterpieceX API key.")
+        logger.error("Run: export MPX_API_KEY='your_api_key_here'")
+        return False
+    
+    # Set bearer token environment variable expected by the SDK (force-set it)
+    os.environ["MPX_SDK_BEARER_TOKEN"] = api_key
+    logger.debug("Set MPX_SDK_BEARER_TOKEN from MPX_API_KEY")
+    return True
+
 def main():
     args = parse_arguments()
     
@@ -254,13 +279,9 @@ def main():
         logger.info("Running in simulation mode - no API calls will be made")
     else:
         # Check if API key is set
-        api_key = os.environ.get("MPX_API_KEY")
-        if not api_key:
-            logger.error("MPX_API_KEY environment variable is not set. Please set it with your MasterpieceX API key.")
+        if not check_api_key():
+            logger.error("Cannot proceed without API key")
             sys.exit(1)
-        
-        # Set bearer token environment variable expected by the SDK
-        os.environ["MPX_SDK_BEARER_TOKEN"] = api_key
     
     # Generate model name from prompt if not provided
     model_name = args.obj_name or get_obj_name_from_prompt(args.prompt)

@@ -1,12 +1,20 @@
+# Core dependencies for 3D functionality
+auto-gptq==0.2.0
 numpy
 torch
-git+https://github.com/huggingface/transformers.git
+transformers
+sentence-transformers
 sentencepiece
 accelerate
 requests
-transformers
-torch
-accelerate
-requests
+
+# Bluesky API dependencies
+atproto
+
+# 3D and AI dependencies
 anthropic
 mpx-genai-sdk
+bitsandbytes
+optimum
+auto-gptq
+einops
