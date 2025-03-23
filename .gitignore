@@ -6,3 +6,4 @@ build
 output/
 .env
 testenv/
+fix_key.sh
