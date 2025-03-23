@@ -130,14 +130,20 @@ class ReplyMonitor:
             }
             
             logger.debug(f"Sending message to Redpanda topic: {self.redpanda_topic}")
-            return self.redpanda_client.send_message(
+            success = self.redpanda_client.send_message(
                 self.redpanda_topic,
                 key=reply["uri"],
                 value=message
             )
+            
+            if not success:
+                logger.warning("Failed to send message to Redpanda, will try again on next reply")
+                # Even if we fail to send to Redpanda, we still processed the reply
+                return True
+            return True
         else:
             logger.warning("Redpanda not connected, message not sent")
-            return False
+            return True  # Still return True as we've processed the reply
     
     def start_monitoring(self) -> None:
         """Start the monitoring loop."""

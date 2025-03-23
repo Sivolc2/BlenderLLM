@@ -9,6 +9,7 @@ A modular Python package that monitors Bluesky posts for replies and sends notif
 - Automatic conversion from web URLs to AT Protocol URIs
 - Integration with Redpanda for event streaming
 - Clean, modular architecture following SOLID principles
+- Robust reconnection handling for Redpanda
 - Installable as a Python package
 
 ## Installation
@@ -96,6 +97,29 @@ export REDPANDA_CLOUD_GEOJSON_TOPIC=your-topic
 
 Or by adding them to your `.env` file.
 
+### Consuming Messages from Redpanda
+
+A consumer script is included to verify messages being sent to the Redpanda topic:
+
+```bash
+# Set environment variables if not in .env
+export REDPANDA_CLOUD_USERNAME=your-username
+export REDPANDA_CLOUD_PASSWORD=your-password
+export REDPANDA_CLOUD_BOOTSTRAP_SERVERS=your-server:9092
+export REDPANDA_CLOUD_GEOJSON_TOPIC=your-topic
+
+# Run the consumer script
+python redpanda_consumer.py
+```
+
+You can also specify arguments directly:
+
+```bash
+python redpanda_consumer.py --bootstrap-servers "your-server:9092" --topic "your-topic" --username "your-username" --password "your-password"
+```
+
+The consumer script will display any new messages received on the specified topic, making it easy to verify that the integration is working correctly.
+
 ### Verifying Redpanda Connection
 
 To verify that your Redpanda connection is working correctly, you can use the included test script:
@@ -150,7 +174,7 @@ options:
 The package follows a modular architecture with clean separation of concerns:
 
 - **BlueskyClient**: Handles interactions with the Bluesky API
-- **RedpandaClient**: Manages connections and message passing with Redpanda
+- **RedpandaClient**: Manages connections and message passing with Redpanda, with built-in reconnection logic
 - **ReplyMonitor**: Core monitoring logic that coordinates the components
 
 This design aligns with SOLID principles:
@@ -190,9 +214,21 @@ Messages sent to Redpanda have the following format:
 If you're having trouble connecting to Redpanda, you can:
 
 1. Verify your credentials with the test script: `python test_redpanda.py`
-2. Ensure your Redpanda server is accessible from your network
-3. Check that the SASL/SCRAM authentication is correctly set up
-4. Run with the `--debug` flag to see more detailed connection logs
+2. Check message delivery with the consumer script: `python redpanda_consumer.py`
+3. Ensure your Redpanda server is accessible from your network
+4. Check that the SASL/SCRAM authentication is correctly set up
+5. Run with the `--debug` flag to see more detailed connection logs
+
+### Handling Disconnections
+
+The system now includes automatic reconnection logic for Redpanda with the following features:
+
+- Automatic reconnection attempts when a connection is lost
+- Exponential backoff strategy to avoid overwhelming the server
+- Graceful handling of temporary network issues
+- Continued monitoring even if Redpanda is unavailable
+
+If you see "Connection error when sending to Redpanda" messages, the system will automatically try to reconnect up to 3 times before giving up on that particular message. Monitoring will continue regardless, and new messages will trigger fresh connection attempts.
 
 ### Missing or Invalid Credentials
 
