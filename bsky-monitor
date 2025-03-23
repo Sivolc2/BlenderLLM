@@ -1,0 +1,33 @@
+#!/bin/bash
+# Bluesky Monitor Launcher
+
+# Script directory
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$SCRIPT_DIR"
+
+# Virtual environment check and setup
+if [ -d "venv" ]; then
+    echo "Activating virtual environment..."
+    source venv/bin/activate
+else
+    echo "Creating virtual environment..."
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install --upgrade pip
+    
+    # Install the package in development mode
+    echo "Installing bsky-monitor in development mode..."
+    pip install -e .
+fi
+
+# Load environment variables if available
+if [ -f ".env" ]; then
+    echo "Loading environment variables from .env file..."
+    export $(grep -v '^#' .env | xargs)
+fi
+
+# Forward all arguments to the monitor
+python -m bsky_monitor "$@"
+
+# Deactivate virtual environment
+deactivate 
