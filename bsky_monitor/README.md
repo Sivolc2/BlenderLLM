@@ -64,14 +64,50 @@ bsky-monitor --post-url "https://bsky.app/profile/handle.bsky.social/post/123" \
 You can use environment variables to configure authentication:
 
 ```bash
+# Bluesky credentials
 export BLUESKY_HANDLE="yourhandle.bsky.social"
 export BLUESKY_APP_PASSWORD="your-app-password"
-export REDPANDA_CLOUD_BOOTSTRAP_SERVERS="redpanda-server:9092"
-export REDPANDA_CLOUD_USERNAME="redpanda-username"
-export REDPANDA_CLOUD_PASSWORD="redpanda-password"
+
+# Redpanda configuration
+export REDPANDA_CLOUD_BOOTSTRAP_SERVERS="your-redpanda-server:9092"
+export REDPANDA_CLOUD_USERNAME="your-redpanda-username"
+export REDPANDA_CLOUD_PASSWORD="your-redpanda-password"
+export REDPANDA_CLOUD_GEOJSON_TOPIC="your-topic-name"
 ```
 
 Alternatively, you can place these in a `.env` file in the project directory.
+
+### Redpanda Setup
+
+To use the Redpanda integration, you need to provide the following credentials:
+
+1. **Bootstrap Servers**: The Redpanda broker address (hostname:port)
+2. **Authentication**: Username and password for SASL/SCRAM authentication
+3. **Topic**: The topic to which notifications will be sent
+
+You can set these up using environment variables directly:
+
+```bash
+export REDPANDA_CLOUD_USERNAME=your-username
+export REDPANDA_CLOUD_PASSWORD=your-password
+export REDPANDA_CLOUD_BOOTSTRAP_SERVERS=your-server:9092
+export REDPANDA_CLOUD_GEOJSON_TOPIC=your-topic
+```
+
+Or by adding them to your `.env` file.
+
+### Verifying Redpanda Connection
+
+To verify that your Redpanda connection is working correctly, you can use the included test script:
+
+```bash
+# Set environment variables if not in .env
+export REDPANDA_CLOUD_USERNAME=your-username
+export REDPANDA_CLOUD_PASSWORD=your-password
+
+# Run the test script
+python test_redpanda.py
+```
 
 ### Full Options
 
@@ -146,6 +182,25 @@ Messages sent to Redpanda have the following format:
   }
 }
 ```
+
+## Troubleshooting
+
+### Redpanda Connection Issues
+
+If you're having trouble connecting to Redpanda, you can:
+
+1. Verify your credentials with the test script: `python test_redpanda.py`
+2. Ensure your Redpanda server is accessible from your network
+3. Check that the SASL/SCRAM authentication is correctly set up
+4. Run with the `--debug` flag to see more detailed connection logs
+
+### Missing or Invalid Credentials
+
+If you see "Redpanda not connected" or "Failed to connect to Redpanda" errors:
+
+1. Make sure your environment variables are correctly set
+2. Verify that your credentials are valid 
+3. Ensure the bootstrap servers address is correct and accessible
 
 ## Development
 

@@ -4,6 +4,7 @@ Reply Monitor Module
 Core monitoring functionality for tracking Bluesky post replies
 """
 
+import os
 import time
 import logging
 from typing import Dict, List, Set, Any, Optional
@@ -23,7 +24,7 @@ class ReplyMonitor:
     def __init__(self, 
                  post_uri: str, 
                  poll_interval: int = 5,
-                 redpanda_topic: str = "bluesky-replies"):
+                 redpanda_topic: str = None):
         """
         Initialize the monitor.
         
@@ -34,7 +35,8 @@ class ReplyMonitor:
         """
         self.post_uri = post_uri
         self.poll_interval = poll_interval
-        self.redpanda_topic = redpanda_topic
+        # Use environment variable if available, otherwise default to "bluesky-replies"
+        self.redpanda_topic = redpanda_topic or os.environ.get("REDPANDA_CLOUD_GEOJSON_TOPIC", "bluesky-replies")
         
         self.bsky_client = BlueskyClient()
         self.redpanda_client = RedpandaClient()
@@ -45,6 +47,8 @@ class ReplyMonitor:
         # State tracking
         self.running = False
         self.last_check_time = None
+        
+        logger.debug(f"ReplyMonitor initialized with topic: {self.redpanda_topic}")
     
     def authenticate_bluesky(self, handle: str, password: str) -> bool:
         """
@@ -125,6 +129,7 @@ class ReplyMonitor:
                 "reply": reply
             }
             
+            logger.debug(f"Sending message to Redpanda topic: {self.redpanda_topic}")
             return self.redpanda_client.send_message(
                 self.redpanda_topic,
                 key=reply["uri"],

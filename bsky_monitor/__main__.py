@@ -47,7 +47,8 @@ def parse_arguments():
     parser.add_argument("--redpanda-servers", type=str,
                       default=os.environ.get("REDPANDA_CLOUD_BOOTSTRAP_SERVERS", "localhost:9092"),
                       help="Redpanda bootstrap servers")
-    parser.add_argument("--redpanda-topic", type=str, default="bluesky-replies",
+    parser.add_argument("--redpanda-topic", type=str, 
+                      default=os.environ.get("REDPANDA_CLOUD_GEOJSON_TOPIC", "bluesky-replies"),
                       help="Redpanda topic for notifications")
     parser.add_argument("--redpanda-username", type=str,
                       default=os.environ.get("REDPANDA_CLOUD_USERNAME"),
